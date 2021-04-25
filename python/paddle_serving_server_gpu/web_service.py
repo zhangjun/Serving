@@ -81,8 +81,8 @@ class WebService(object):
         f = open(client_config, 'r')
         model_conf = google.protobuf.text_format.Merge(
             str(f.read()), model_conf)
-        self.feed_vars = {var.name: var for var in model_conf.feed_var}
-        self.fetch_vars = {var.name: var for var in model_conf.fetch_var}
+        self.feed_vars = {var.alias_name: var for var in model_conf.feed_var}
+        self.fetch_vars = {var.alias_name: var for var in model_conf.fetch_var}
 
     def set_gpus(self, gpus):
         print("This API will be deprecated later. Please do not use it")
@@ -207,7 +207,7 @@ class WebService(object):
         if not request.json:
             abort(400)
         if "fetch" not in request.json:
-            abort(400)
+            request.json["fetch"] = [x for x in self.fetch_vars.keys()]
         try:
             feed, fetch, is_batch = self.preprocess(request.json["feed"],
                                                     request.json["fetch"])
